@@ -29,7 +29,7 @@ import {TSMT$GraphArc} from './GraphArc';
 
 export class TSMT$GraphNode<T>
 {
-  protected _id: number;                  // id associated with this node (expected to be greater than or equal to zero)
+  protected _id: string | number;         // id associated with this node (expected to be greater than or equal to zero if number)
   protected _val: T;                      // value of this node
   protected _prev: TSMT$GraphNode<T>;     // reference to previous node in a list
   protected _next: TSMT$GraphNode<T>;     // reference to next node in a list
@@ -74,9 +74,9 @@ export class TSMT$GraphNode<T>
   /**
    * Access the id of this graph node
    *
-   * @returns {number} Node ID
+   * @returns {string | number} Node ID
    */
-  public get id(): number
+  public get id(): string| number
   {
     return this._id;
   }
@@ -88,9 +88,17 @@ export class TSMT$GraphNode<T>
    *
    * @returns nothing The new node id is assigned as long as it is a valid input
    */
-  public set id(value: number)
+  public set id(value: string | number)
   {
-    this._id = !isNaN(value) && isFinite(value) && value >= 0 ? value : this._id;
+    if (typeof value === 'string')
+    {
+      this._id = value;
+    }
+    else
+    {
+      const nodeID: number = +value;
+      this._id = !isNaN(nodeID) && isFinite(nodeID) && value >= 0 ? value : this._id;
+    }
   }
 
   /**

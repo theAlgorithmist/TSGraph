@@ -17,14 +17,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var GraphNode_1 = require("./GraphNode");
 /**
- * Typescript Math Toolkit: Graph Arc.  An arc is defined by a terminating node and a numerical cost, which is zero
- * by default.  This is largely a convenience class for TSMT$Graph<T>.
+ * Typescript Math Toolkit: Graph Arc.  An arc or edge is defined by a terminating node and a numerical cost,
+ * which is zero by default.  This is largely a convenience class for TSMT$Graph<T>.
  *
  * @author Jim Armstrong (www.algorithmist.net)
  *
  * @version 1.0
  */
-var TSMT$GraphArc = (function () {
+var TSMT$GraphArc = /** @class */ (function () {
     /**
      *
      * Construct a graph arc

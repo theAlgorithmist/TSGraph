@@ -18,6 +18,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var GraphNode_1 = require("../src/GraphNode");
 var GraphArc_1 = require("../src/GraphArc");
 var Graph_1 = require("../src/Graph");
+var graph_from_list_1 = require("../src/graph-from-list");
+// test graphs
+var tests_1 = require("../src/graphs/tests");
+var tests_2 = require("../src/graphs/tests");
+var tests_3 = require("../src/graphs/tests");
+var tests_4 = require("../src/graphs/tests");
+var tests_5 = require("../src/graphs/tests");
 var Chai = require("chai");
 var expect = Chai.expect;
 // Test Suites
@@ -82,7 +89,7 @@ describe('TSMT Graph Node', function () {
     });
 });
 describe('TSMT Graph Arc', function () {
-    it('newly constructed Arc has default zero cost', function () {
+    it('newly constructed edge has default zero cost', function () {
         var node = new GraphNode_1.TSMT$GraphNode();
         var arc = new GraphArc_1.TSMT$GraphArc(node);
         expect(arc.cost).to.equal(0);
@@ -276,18 +283,18 @@ describe('Graph Tests', function () {
         graph.addNode(node5);
         graph.addNode(node6);
         expect(graph.size).to.equal(6);
-        graph.addSingleArc(node1, node4, 1.0); // 1-4
-        graph.addSingleArc(node1, node5, 0.75); // 1-5
-        graph.addSingleArc(node1, node6, 1.2); // 1-6
-        graph.addSingleArc(node2, node5, 0.5); // 2-5
-        graph.addSingleArc(node2, node6, 1.0); // 2-6
-        graph.addSingleArc(node3, node6, 1.8); // 3-6
-        graph.addSingleArc(node4, node1, 1.4); // 4-1
-        graph.addSingleArc(node5, node1, 0.9); // 5-1
-        graph.addSingleArc(node5, node2, 1.2); // 5-2
-        graph.addSingleArc(node6, node1, 1.6); // 6-1
-        graph.addSingleArc(node6, node2, 1.2); // 6-2
-        graph.addSingleArc(node6, node3, 1.0); // 6-3
+        graph.addEdge(node1, node4, 1.0); // 1-4
+        graph.addEdge(node1, node5, 0.75); // 1-5
+        graph.addEdge(node1, node6, 1.2); // 1-6
+        graph.addEdge(node2, node5, 0.5); // 2-5
+        graph.addEdge(node2, node6, 1.0); // 2-6
+        graph.addEdge(node3, node6, 1.8); // 3-6
+        graph.addEdge(node4, node1, 1.4); // 4-1
+        graph.addEdge(node5, node1, 0.9); // 5-1
+        graph.addEdge(node5, node2, 1.2); // 5-2
+        graph.addEdge(node6, node1, 1.6); // 6-1
+        graph.addEdge(node6, node2, 1.2); // 6-2
+        graph.addEdge(node6, node3, 1.0); // 6-3
         var found = graph.findNode(6);
         expect(found === node6).to.be.true;
         expect(node6.connected(node3)).to.be.true;
@@ -328,5 +335,118 @@ describe('Graph Tests', function () {
         var nodes = graph.toArray();
         expect(nodes.length).to.equal(3);
         expect(nodes[0] === node1).to.be.true;
+    });
+});
+describe('Graph from list', function () {
+    it('Returns empty Graph from invalid input', function () {
+        var graph = graph_from_list_1.graphFromList(null);
+        expect(graph.size).to.equal(0);
+    });
+    it('Correctly creates a graph from basic data', function () {
+        var graph = graph_from_list_1.graphFromList(tests_1.graph1);
+        expect(graph.size).to.equal(8);
+    });
+});
+describe('DFS', function () {
+    it('Returns empty list from invalid input', function () {
+        var graph = new Graph_1.TSMT$Graph();
+        expect(graph.size).to.equal(0);
+        var list = graph.DFS();
+        expect(list.length).to.equal(0);
+    });
+    it('Correctly traverses a graph from the root node #1', function () {
+        var graph = graph_from_list_1.graphFromList(tests_1.graph1);
+        expect(graph.size).to.equal(8);
+        var list = graph.DFS();
+        expect(list.length).to.equal(8);
+        expect(list[0].id).to.equal('R');
+        expect(list[1].id).to.equal('A');
+        expect(list[2].id).to.equal('D');
+        expect(list[3].id).to.equal('G');
+        expect(list[4].id).to.equal('B');
+        expect(list[5].id).to.equal('E');
+        expect(list[6].id).to.equal('C');
+        expect(list[7].id).to.equal('F');
+    });
+    it('Correctly traverses a graph from the root node #2', function () {
+        var graph = graph_from_list_1.graphFromList(tests_2.graph2);
+        expect(graph.size).to.equal(5);
+        var list = graph.DFS();
+        expect(list[0].id).to.equal('0');
+        expect(list[1].id).to.equal('1');
+        expect(list[2].id).to.equal('2');
+        expect(list[3].id).to.equal('4');
+        expect(list[4].id).to.equal('3');
+    });
+    it('Correctly traverses a graph from the root node #3', function () {
+        var graph = graph_from_list_1.graphFromList(tests_3.graph3);
+        expect(graph.size).to.equal(9);
+        var list = graph.DFS();
+        expect(list[0].id).to.equal('A');
+        expect(list[1].id).to.equal('B');
+        expect(list[2].id).to.equal('S');
+        expect(list[3].id).to.equal('C');
+        expect(list[4].id).to.equal('D');
+        expect(list[5].id).to.equal('E');
+        expect(list[6].id).to.equal('H');
+        expect(list[7].id).to.equal('F');
+        expect(list[8].id).to.equal('G');
+    });
+    it('Correctly traverses a graph from a node with specified value', function () {
+        var graph = graph_from_list_1.graphFromList(tests_1.graph1);
+        expect(graph.size).to.equal(8);
+        var list = graph.DFS('A');
+        expect(list.length).to.equal(3);
+        expect(list[0].id).to.equal('A');
+        expect(list[1].id).to.equal('D');
+        expect(list[2].id).to.equal('G');
+    });
+});
+describe('BFS', function () {
+    it('Returns empty list from invalid input', function () {
+        var graph = new Graph_1.TSMT$Graph();
+        expect(graph.size).to.equal(0);
+        var list = graph.BFS();
+        expect(list.length).to.equal(0);
+    });
+    it('Correctly traverses a graph from the root node #1', function () {
+        var graph = graph_from_list_1.graphFromList(tests_4.graph4);
+        expect(graph.size).to.equal(8);
+        var list = graph.BFS();
+        expect(list.length).to.equal(8);
+        expect(list[0].id).to.equal('0');
+        expect(list[1].id).to.equal('1');
+        expect(list[2].id).to.equal('2');
+        expect(list[3].id).to.equal('3');
+        expect(list[4].id).to.equal('4');
+        expect(list[5].id).to.equal('5');
+        expect(list[6].id).to.equal('6');
+        expect(list[7].id).to.equal('7');
+    });
+    it('Correctly traverses a graph from the root node #2', function () {
+        var graph = graph_from_list_1.graphFromList(tests_5.graph5);
+        expect(graph.size).to.equal(6);
+        var list = graph.BFS();
+        expect(list.length).to.equal(6);
+        expect(list[0].id).to.equal('R');
+        expect(list[1].id).to.equal('1');
+        expect(list[2].id).to.equal('2');
+        expect(list[3].id).to.equal('3');
+        expect(list[4].id).to.equal('4');
+        expect(list[5].id).to.equal('5');
+    });
+    it('Correctly traverses a graph from the root node #3', function () {
+        var graph = graph_from_list_1.graphFromList(tests_1.graph1);
+        expect(graph.size).to.equal(8);
+        var list = graph.BFS();
+        expect(list.length).to.equal(8);
+        expect(list[0].id).to.equal('R');
+        expect(list[1].id).to.equal('A');
+        expect(list[2].id).to.equal('B');
+        expect(list[3].id).to.equal('C');
+        expect(list[4].id).to.equal('D');
+        expect(list[5].id).to.equal('E');
+        expect(list[6].id).to.equal('F');
+        expect(list[7].id).to.equal('G');
     });
 });

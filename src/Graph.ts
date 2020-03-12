@@ -15,23 +15,27 @@
  */
 
 /**
- * Typescript Math Toolkit: Graph consisting of nodes and arcs that are instances of TSMT$GraphNode<T> and TSMT$GraphArc<T>.
- * 
- * inspired by polygonal ds library
+ * Typescript Math Toolkit: Graph consisting of interconnections between TSMT$GraphNode<T> instances.
  *
- * @author Jim Armstrong (www.algorithmist.net)
+ * @author Jim Armstrong (www.algorithmist.net), inspired by polygonal ds library
  * 
- * @version 1.0
+ * @version 1.1 (Added DFS/BFS)
  */
 
-import {TSMT$GraphNode} from './GraphNode';
-import {TSMT$GraphArc } from './GraphArc';
+import { TSMT$GraphNode } from './GraphNode';
+import { TSMT$GraphArc  } from './GraphArc';
 
 export class TSMT$Graph<T>
 {
   protected _size: number;                     // size or number of nodes in the graph
   protected _nodeList: TSMT$GraphNode<T>;      // head of node list for this graph
   protected _curNode: TSMT$GraphNode<T>;       // current or most recently added node
+
+  // structure (stack/queue) that could be used for non-recursive DFS/BFS traversal
+  protected _struct: Array<TSMT$GraphNode<T>>;
+
+  // record the specified graph traversal
+  protected _traversal: Array<TSMT$GraphNode<T>>;
 
   /**
    * Construct a new TSMT$Graph<T>
@@ -48,6 +52,12 @@ export class TSMT$Graph<T>
    */
   public clear(): void
   {
+    this._struct        =  this._struct === undefined ? [] : this._struct;
+    this._struct.length = 0;
+
+    this._traversal        =  this._traversal === undefined ? [] : this._traversal;
+    this._traversal.length = 0;
+
     let node: TSMT$GraphNode<T> = this._nodeList;
     let next: TSMT$GraphNode<T>;
     let arc: TSMT$GraphArc<T>;
@@ -56,7 +66,7 @@ export class TSMT$Graph<T>
     while (node != null)
     {
       next = node.next;
-      arc = node.arcList;
+      arc  = node.arcList;
 
       while (arc != null)
       {
@@ -202,7 +212,7 @@ export class TSMT$Graph<T>
   }
 
   /**
-   * Add a single arc to this graph by specifying initial and terminal nodes
+   * Add a single edge (or arc) to this graph by specifying initial and terminal nodes
    *
    * @param source: TSMT$GraphNode<T> Source or initial node of the arc
    *
@@ -212,7 +222,7 @@ export class TSMT$Graph<T>
    *
    * @returns nothing The one-way arc is created and added to the graph
    */
-  public addSingleArc(source: TSMT$GraphNode<T>, target: TSMT$GraphNode<T>, cost: number = 1.0): void
+  public addEdge(source: TSMT$GraphNode<T>, target: TSMT$GraphNode<T>, cost: number = 1.0): void
   {
     let walk: TSMT$GraphNode<T> = this._nodeList;
 
@@ -245,7 +255,7 @@ export class TSMT$Graph<T>
   }
 
   /**
-   * Add a mutually connected arc to this graph by specifying initial and terminal nodes
+   * Add a mutually connected edge (or arc) to this graph by specifying initial and terminal nodes
    *
    * @param source: TSMT$GraphNode<T> Source or initial node of the arc
    *
@@ -255,7 +265,7 @@ export class TSMT$Graph<T>
    *
    * @returns nothing The two-way arc is created and added to the graph
    */
-  public addMutualArc(source: TSMT$GraphNode<T>, target: TSMT$GraphNode<T>, cost: number = 1.0): void
+  public addMutualEdge(source: TSMT$GraphNode<T>, target: TSMT$GraphNode<T>, cost: number = 1.0): void
   {
     let walk: TSMT$GraphNode<T> = this._nodeList;
 
@@ -286,7 +296,7 @@ export class TSMT$Graph<T>
   /**
    * Clear all marks associated with nodes in this graph
    *
-   * @returns Nothing All nodes in the graph are marked as not having been traversed
+   * @returns Nothing All nodes in the graph are marked as not having been traversed or visited
    */
   public clearMarks(): void
   {
@@ -295,7 +305,7 @@ export class TSMT$Graph<T>
     while (node != null)
     {
       node.marked = false;
-      node = node.next;
+      node        = node.next;
     }
   }
 
@@ -320,7 +330,7 @@ export class TSMT$Graph<T>
    *
    * @param x: T Test value
    *
-   * @returns {boolean} True if the graph contains a node with the specified value
+   * @returns {boolean} True if the graph contains a node with exactly the specified value
    */
   public contains(x: T): boolean
   {
@@ -328,7 +338,7 @@ export class TSMT$Graph<T>
 
     while (node != null)
     {
-      if (node.value == x)
+      if (node.value === x)
       {
         // value found
         return true;
@@ -342,9 +352,9 @@ export class TSMT$Graph<T>
   }
 
   /**
-   * Remove the node frmo the graph with the specified value
+   * Remove the node from the graph with the specified value
    *
-   * @param x: T Node value
+   * @param {T} x Node value
    *
    * @returns {boolean} True if a node with the specified value is found and removed from the graph
    */
@@ -377,6 +387,9 @@ export class TSMT$Graph<T>
     return found;
   }
 
+  /**
+   * Convert the node list to an Array
+   */
   public toArray(): Array<TSMT$GraphNode<T>>
   {
     let a    = new Array<TSMT$GraphNode<T>>();
@@ -449,5 +462,165 @@ export class TSMT$Graph<T>
     }
 
     node.arcList = null;
+  }
+
+  /**
+   * Perform a depth-first search of an undirected graph, starting at the supplied node and only traversing nodes that
+   * can be reached from that node.  Return the results in an Array of {TSMT$GraphNode<T>>} instances.  Edge costs are
+   * not currently considered.
+   *
+   * @param startNode Can be a reference to a starting node or a node with the specified value (a search is performed
+   * for the start node in the latter case)
+   */
+  public DFS(startNode: TSMT$GraphNode<T> | T = null): Array<TSMT$GraphNode<T>>
+  {
+    // outliers
+    if (this.size === 0) {
+      return [];
+    }
+
+    if (this.size === 1) {
+      return [this._nodeList];
+    }
+
+    this._struct.length    = 0;
+    this._traversal.length = 0;
+
+    let node: TSMT$GraphNode<T>;
+    let rootNode: TSMT$GraphNode<T>;
+
+    if (startNode === undefined || startNode == null)
+    {
+      node = this._nodeList;
+    }
+    else if (startNode instanceof TSMT$GraphNode)
+    {
+      node = startNode;
+    }
+    else
+    {
+      node = this.findNode(startNode as T);
+    }
+
+    rootNode = node;
+
+    if (rootNode == null) {
+      return [];
+    }
+
+    while (node != null)
+    {
+      node.marked = false;
+      node        = node.next;
+    }
+
+    // can be done pretty easily recursively; non-recursive version uses a stack as a supporting data structure
+    this.__DFSTraversal(rootNode);
+
+    return this._traversal;
+  }
+
+  protected __DFSTraversal(node: TSMT$GraphNode<T>): void
+  {
+    node.marked = true;
+    this._traversal.push(node);
+
+    let arc: TSMT$GraphArc<T> = node.arcList;
+
+    while (arc != null)
+    {
+      node = arc.node;
+      if (!node.marked) {
+        this.__DFSTraversal(node);
+      }
+
+      arc = arc.next;
+    }
+  }
+
+  /**
+   * Perform a breadth-first search of an undirected graph, starting at the supplied node and only traversing nodes that
+   * can be reached from that node.  Return the results in an Array of {TSMT$GraphNode<T>>} instances.  Edge costs are
+   * not currently considered.
+   *
+   * @param startNode Can be a reference to a starting node or a node with the specified value (a search is performed
+   * for the start node in the latter case)
+   */
+  public BFS(startNode: TSMT$GraphNode<T> | T = null): Array<TSMT$GraphNode<T>>
+  {
+    // TODO make this more DRY
+
+    // outliers
+    if (this.size === 0) {
+      return [];
+    }
+
+    if (this.size === 1) {
+      return [this._nodeList];
+    }
+
+    this._struct.length    = 0;
+    this._traversal.length = 0;
+
+    let node: TSMT$GraphNode<T>;
+    let rootNode: TSMT$GraphNode<T>;
+
+    if (startNode === undefined || startNode == null)
+    {
+      node = this._nodeList;
+    }
+    else if (startNode instanceof TSMT$GraphNode)
+    {
+      node = startNode;
+    }
+    else
+    {
+      node = this.findNode(startNode as T);
+    }
+
+    rootNode = node;
+
+    if (rootNode == null) {
+      return [];
+    }
+
+    while (node != null)
+    {
+      node.marked = false;
+      node        = node.next;
+    }
+
+    this.__BFSTraversal(rootNode);
+
+    return this._traversal;
+  }
+
+  protected __BFSTraversal(node: TSMT$GraphNode<T>): void
+  {
+    // Traversal uses a queue (implemented as an Array).  Queue is FIFO, so enqueue is push, dequeue is shift.
+    node.marked = true;
+    this._struct.push(node);
+
+    let arc: TSMT$GraphArc<T>;
+
+    while (this._struct.length > 0)
+    {
+      node = this._struct.shift();
+      this._traversal.push(node);
+
+      arc = node.arcList;
+      while (arc != null)
+      {
+        node = arc.node;
+
+        if (!node.marked)
+        {
+          node.marked = true;
+          this._struct.push(node);
+        }
+
+        arc = arc.next;
+      }
+    }
   }
 }

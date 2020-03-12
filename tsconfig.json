@@ -10,8 +10,8 @@
     "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true,
     "noExternalResolve": false,
-    "sortOutput": true
-    ,"typeRoots": [
+    "sortOutput": true,
+    "typeRoots": [
       "/node_modules/@types"
     ]
   },

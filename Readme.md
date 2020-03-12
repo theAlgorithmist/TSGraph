@@ -14,7 +14,7 @@ theAlgorithmist [at] gmail [dot] com
 
 Typescript: 2.3.2
 
-Version: 1.0
+Version: 2.0
 
 
 ## Installation
@@ -113,6 +113,8 @@ clearParent(): void
 contains(x: T): boolean
 remove(x: T): boolean
 toArray(): Array<TSMT$GraphNode<T>>
+BFS(): Array<TSMT$GraphNode<T>>
+DFS(): Array<TSMT$GraphNode<T>>
 
 ```
 
@@ -169,6 +171,12 @@ Refer to the specs in the test folder for more usage examples.
 
 For performance reasons, direct references are used inside all classes.  Nodes are not cloned when added to a graph, so if an outside reference is maintained to input nodes, take care not to improperly mutate the nodes.
 
+Depth- and breadth-first searches were added in V2.0.  See the specs for sample usage.
+
+DFS was implemented recursively as the recursive implementation is intuitive and simple to write (as recursions go).  A non-recursive version is based on using a stack as an interim structure and this would be a useful modification for a very large number of nodes and edges.
+
+BFS was implemented using the classic approach in which a queue (implemented with an Array) is used as an intermim data structure.
+
 
 License
 ----
@@ -179,5 +187,5 @@ Apache 2.0
 
 [//]: # (kudos http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
 
-[The Algorithmist]: <http://algorithmist.net>
+[The Algorithmist]: <https://www.linkedin.com/in/jimarmstrong>
 

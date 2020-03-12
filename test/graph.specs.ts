@@ -14,11 +14,21 @@
 */
 
 // Specs for various alpha release of TSMT Graph
-import {TSMT$GraphNode} from '../src/GraphNode';
-import {TSMT$GraphArc } from '../src/GraphArc';
-import {TSMT$Graph    } from '../src/Graph';
+import { TSMT$GraphNode } from '../src/GraphNode';
+import { TSMT$GraphArc  } from '../src/GraphArc';
+import { TSMT$Graph     } from '../src/Graph';
+
+import { graphFromList } from "../src/graph-from-list";
+
+// test graphs
+import { graph1 } from "../src/graphs/tests";
+import { graph2 } from "../src/graphs/tests";
+import { graph3 } from "../src/graphs/tests";
+import { graph4 } from "../src/graphs/tests";
+import { graph5 } from "../src/graphs/tests";
 
 import * as Chai from 'chai';
+
 const expect = Chai.expect;
 
 // Test Suites
@@ -112,7 +122,7 @@ describe('TSMT Graph Node', () => {
 
 describe('TSMT Graph Arc', () =>
 {
-  it('newly constructed Arc has default zero cost', function ()
+  it('newly constructed edge has default zero cost', () =>
   {
     let node: TSMT$GraphNode<number> = new TSMT$GraphNode<number>();
     let arc: TSMT$GraphArc<number>   = new TSMT$GraphArc<number>(node);
@@ -120,7 +130,7 @@ describe('TSMT Graph Arc', () =>
     expect(arc.cost).to.equal(0);
   });
 
-  it('node accessor returns proper reference', function ()
+  it('node accessor returns proper reference', () =>
   {
     let node: TSMT$GraphNode<number> = new TSMT$GraphNode<number>();
     let arc: TSMT$GraphArc<number>   = new TSMT$GraphArc<number>(node);
@@ -128,7 +138,7 @@ describe('TSMT Graph Arc', () =>
     expect(arc.node === node).to.be.true;
   });
 
-  it('previous and next references are null by default', function ()
+  it('previous and next references are null by default', () =>
   {
     let node: TSMT$GraphNode<number> = new TSMT$GraphNode<number>();
     let arc: TSMT$GraphArc<number>   = new TSMT$GraphArc<number>(node);
@@ -137,7 +147,7 @@ describe('TSMT Graph Arc', () =>
     expect(arc.next    ).to.be.null;
   });
 
-  it('arc accepts proper cost pre- and post-construction', function ()
+  it('arc accepts proper cost pre- and post-construction', () =>
   {
     let node: TSMT$GraphNode<number> = new TSMT$GraphNode<number>();
     let arc: TSMT$GraphArc<number>   = new TSMT$GraphArc<number>(node);
@@ -153,7 +163,7 @@ describe('TSMT Graph Arc', () =>
     expect(arc1.cost).to.equal(2);
   });
 
-  it('arc accepts proper previous and next arc references', function ()
+  it('arc accepts proper previous and next arc references', () =>
   {
     let node: TSMT$GraphNode<number> = new TSMT$GraphNode<number>(1);
     let arc: TSMT$GraphArc<number>   = new TSMT$GraphArc<number>(node);
@@ -177,7 +187,7 @@ describe('TSMT Graph Arc', () =>
 
 describe('Node and Arc Tests', () =>
 {
-  it('correctly adds a singleton arc', function ()
+  it('correctly adds a singleton arc', () =>
   {
     let root: TSMT$GraphNode<number> = new TSMT$GraphNode<number>(1);
     let node: TSMT$GraphNode<number> = new TSMT$GraphNode<number>(2);
@@ -190,7 +200,7 @@ describe('Node and Arc Tests', () =>
     expect( <number> list.node.value).to.equal(2);
   });
 
-  it('correctly adds and removes multiple arcs', function ()
+  it('correctly adds and removes multiple arcs', () =>
   {
     let root: TSMT$GraphNode<number>  = new TSMT$GraphNode<number>(1);
     let node: TSMT$GraphNode<number>  = new TSMT$GraphNode<number>(2);
@@ -217,7 +227,7 @@ describe('Node and Arc Tests', () =>
     expect(root.arcList).to.be.null;
   });
 
-  it('correctly removes a single arcs', function ()
+  it('correctly removes a single arcs', () =>
   {
     let root: TSMT$GraphNode<number>  = new TSMT$GraphNode<number>(1);
     let node: TSMT$GraphNode<number>  = new TSMT$GraphNode<number>(2);
@@ -245,7 +255,7 @@ describe('Node and Arc Tests', () =>
   });
 
 
-  it('correctly identifies connectivity', function ()
+  it('correctly identifies connectivity', () =>
   {
     let root: TSMT$GraphNode<number>  = new TSMT$GraphNode<number>(1);
     let node: TSMT$GraphNode<number>  = new TSMT$GraphNode<number>(2);
@@ -273,7 +283,7 @@ describe('Node and Arc Tests', () =>
 
 describe('Graph Tests', () =>
 {
-  it('Newly constructed graph has zero size and is empty', function ()
+  it('Newly constructed graph has zero size and is empty', () =>
   {
     let graph: TSMT$Graph<number> = new TSMT$Graph<number>();
 
@@ -281,7 +291,7 @@ describe('Graph Tests', () =>
     expect(graph.isEmpty).to.be.true;
   });
 
-  it('Graph correctly adds nodes', function ()
+  it('Graph correctly adds nodes', () =>
   {
     let graph: TSMT$Graph<number>     = new TSMT$Graph<number>();
     let node: TSMT$GraphNode<number>  = new TSMT$GraphNode<number>(1);
@@ -314,7 +324,7 @@ describe('Graph Tests', () =>
     expect(node).to.be.null;
   });
 
-  it('Graph correctly removes a node', function ()
+  it('Graph correctly removes a node', () =>
   {
     let graph: TSMT$Graph<number>     = new TSMT$Graph<number>();
     let node: TSMT$GraphNode<number>  = new TSMT$GraphNode<number>(1);
@@ -350,7 +360,7 @@ describe('Graph Tests', () =>
     expect(node).to.be.null;
   });
 
-  it('Graph correctly finds a node', function ()
+  it('Graph correctly finds a node', () =>
   {
     let graph: TSMT$Graph<number>     = new TSMT$Graph<number>();
     let node: TSMT$GraphNode<number>  = new TSMT$GraphNode<number>(1);
@@ -372,7 +382,7 @@ describe('Graph Tests', () =>
     expect(found).to.be.null;
   });
 
-  it('Graph correctly builds graph from single arcs', function ()
+  it('Graph correctly builds graph from single arcs', () =>
   {
     let graph: TSMT$Graph<number> = new TSMT$Graph<number>();
 
@@ -395,18 +405,18 @@ describe('Graph Tests', () =>
 
     expect(graph.size).to.equal(6);
 
-    graph.addSingleArc(node1, node4, 1.0);   // 1-4
-    graph.addSingleArc(node1, node5, 0.75);  // 1-5
-    graph.addSingleArc(node1, node6, 1.2);   // 1-6
-    graph.addSingleArc(node2, node5, 0.5);   // 2-5
-    graph.addSingleArc(node2, node6, 1.0);   // 2-6
-    graph.addSingleArc(node3, node6, 1.8);   // 3-6
-    graph.addSingleArc(node4, node1, 1.4);   // 4-1
-    graph.addSingleArc(node5, node1, 0.9);   // 5-1
-    graph.addSingleArc(node5, node2, 1.2);   // 5-2
-    graph.addSingleArc(node6, node1, 1.6);   // 6-1
-    graph.addSingleArc(node6, node2, 1.2);   // 6-2
-    graph.addSingleArc(node6, node3, 1.0);   // 6-3
+    graph.addEdge(node1, node4, 1.0);   // 1-4
+    graph.addEdge(node1, node5, 0.75);  // 1-5
+    graph.addEdge(node1, node6, 1.2);   // 1-6
+    graph.addEdge(node2, node5, 0.5);   // 2-5
+    graph.addEdge(node2, node6, 1.0);   // 2-6
+    graph.addEdge(node3, node6, 1.8);   // 3-6
+    graph.addEdge(node4, node1, 1.4);   // 4-1
+    graph.addEdge(node5, node1, 0.9);   // 5-1
+    graph.addEdge(node5, node2, 1.2);   // 5-2
+    graph.addEdge(node6, node1, 1.6);   // 6-1
+    graph.addEdge(node6, node2, 1.2);   // 6-2
+    graph.addEdge(node6, node3, 1.0);   // 6-3
 
     let found: TSMT$GraphNode<number> = graph.findNode(6);
     expect(found === node6).to.be.true;
@@ -414,7 +424,7 @@ describe('Graph Tests', () =>
     expect(node6.connected(node3)).to.be.true;
   });
 
-  it('Graph properly clears and accepts new data', function ()
+  it('Graph properly clears and accepts new data', () =>
   {
     let graph: TSMT$Graph<number> = new TSMT$Graph<number>();
 
@@ -435,7 +445,7 @@ describe('Graph Tests', () =>
     expect(graph.size).to.equal(3);
   });
 
-  it('Graph properly identifies presence of a specified value', function ()
+  it('Graph properly identifies presence of a specified value', () =>
   {
     let graph: TSMT$Graph<number> = new TSMT$Graph<number>();
 
@@ -451,7 +461,7 @@ describe('Graph Tests', () =>
     expect(graph.contains(0)).to.be.false;
   });
 
-  it('Graph properly exports nodes as an array', function ()
+  it('Graph properly exports nodes as an array', () =>
   {
     let graph: TSMT$Graph<number> = new TSMT$Graph<number>();
 
@@ -467,5 +477,173 @@ describe('Graph Tests', () =>
 
     expect(nodes.length).to.equal(3);
     expect(nodes[0] === node1).to.be.true;
+  });
+});
+
+describe('Graph from list', () => {
+
+  it('Returns empty Graph from invalid input', () =>
+  {
+    const graph: TSMT$Graph<string> = graphFromList(null);
+
+    expect(graph.size).to.equal(0);
+  });
+
+  it('Correctly creates a graph from basic data', () =>
+  {
+    const graph: TSMT$Graph<string> = graphFromList(graph1);
+
+    expect(graph.size).to.equal(8);
+  });
+});
+
+describe('DFS', () => {
+
+  it('Returns empty list from invalid input', () =>
+  {
+    const graph: TSMT$Graph<string> = new TSMT$Graph<string>();
+
+    expect(graph.size).to.equal(0);
+
+    const list: Array<TSMT$GraphNode<string>> = graph.DFS();
+    expect(list.length).to.equal(0);
+  });
+
+  it('Correctly traverses a graph from the root node #1', () =>
+  {
+    const graph: TSMT$Graph<string> = graphFromList(graph1);
+
+    expect(graph.size).to.equal(8);
+
+    const list: Array<TSMT$GraphNode<string>> = graph.DFS();
+    expect(list.length).to.equal(8);
+
+    expect(list[0].id).to.equal('R');
+    expect(list[1].id).to.equal('A');
+    expect(list[2].id).to.equal('D');
+    expect(list[3].id).to.equal('G');
+    expect(list[4].id).to.equal('B');
+    expect(list[5].id).to.equal('E');
+    expect(list[6].id).to.equal('C');
+    expect(list[7].id).to.equal('F');
+  });
+
+  it('Correctly traverses a graph from the root node #2', () =>
+  {
+    const graph: TSMT$Graph<string> = graphFromList(graph2);
+
+    expect(graph.size).to.equal(5);
+
+    const list: Array<TSMT$GraphNode<string>> = graph.DFS();
+
+    expect(list[0].id).to.equal('0');
+    expect(list[1].id).to.equal('1');
+    expect(list[2].id).to.equal('2');
+    expect(list[3].id).to.equal('4');
+    expect(list[4].id).to.equal('3');
+  });
+
+  it('Correctly traverses a graph from the root node #3', () =>
+  {
+    const graph: TSMT$Graph<string> = graphFromList(graph3);
+
+    expect(graph.size).to.equal(9);
+
+    const list: Array<TSMT$GraphNode<string>> = graph.DFS();
+
+    expect(list[0].id).to.equal('A');
+    expect(list[1].id).to.equal('B');
+    expect(list[2].id).to.equal('S');
+    expect(list[3].id).to.equal('C');
+    expect(list[4].id).to.equal('D');
+    expect(list[5].id).to.equal('E');
+    expect(list[6].id).to.equal('H');
+    expect(list[7].id).to.equal('F');
+    expect(list[8].id).to.equal('G');
+  });
+
+  it('Correctly traverses a graph from a node with specified value', () =>
+  {
+    const graph: TSMT$Graph<string> = graphFromList(graph1);
+
+    expect(graph.size).to.equal(8);
+
+    const list: Array<TSMT$GraphNode<string>> = graph.DFS('A');
+
+    expect(list.length).to.equal(3);
+
+    expect(list[0].id).to.equal('A');
+    expect(list[1].id).to.equal('D');
+    expect(list[2].id).to.equal('G');
+  });
+});
+
+describe('BFS', () => {
+
+  it('Returns empty list from invalid input', () => {
+    const graph: TSMT$Graph<string> = new TSMT$Graph<string>();
+
+    expect(graph.size).to.equal(0);
+
+    const list: Array<TSMT$GraphNode<string>> = graph.BFS();
+    expect(list.length).to.equal(0);
+  });
+
+  it('Correctly traverses a graph from the root node #1', () =>
+  {
+    const graph: TSMT$Graph<string> = graphFromList(graph4);
+
+    expect(graph.size).to.equal(8);
+
+    const list: Array<TSMT$GraphNode<string>> = graph.BFS();
+
+    expect(list.length).to.equal(8);
+
+    expect(list[0].id).to.equal('0');
+    expect(list[1].id).to.equal('1');
+    expect(list[2].id).to.equal('2');
+    expect(list[3].id).to.equal('3');
+    expect(list[4].id).to.equal('4');
+    expect(list[5].id).to.equal('5');
+    expect(list[6].id).to.equal('6');
+    expect(list[7].id).to.equal('7');
+  });
+
+  it('Correctly traverses a graph from the root node #2', () =>
+  {
+    const graph: TSMT$Graph<string> = graphFromList(graph5);
+
+    expect(graph.size).to.equal(6);
+
+    const list: Array<TSMT$GraphNode<string>> = graph.BFS();
+
+    expect(list.length).to.equal(6);
+
+    expect(list[0].id).to.equal('R');
+    expect(list[1].id).to.equal('1');
+    expect(list[2].id).to.equal('2');
+    expect(list[3].id).to.equal('3');
+    expect(list[4].id).to.equal('4');
+    expect(list[5].id).to.equal('5');
+  });
+
+  it('Correctly traverses a graph from the root node #3', () =>
+  {
+    const graph: TSMT$Graph<string> = graphFromList(graph1);
+
+    expect(graph.size).to.equal(8);
+
+    const list: Array<TSMT$GraphNode<string>> = graph.BFS();
+
+    expect(list.length).to.equal(8);
+
+    expect(list[0].id).to.equal('R');
+    expect(list[1].id).to.equal('A');
+    expect(list[2].id).to.equal('B');
+    expect(list[3].id).to.equal('C');
+    expect(list[4].id).to.equal('D');
+    expect(list[5].id).to.equal('E');
+    expect(list[6].id).to.equal('F');
+    expect(list[7].id).to.equal('G');
   });
 });

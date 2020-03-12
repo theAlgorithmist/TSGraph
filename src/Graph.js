@@ -15,7 +15,15 @@
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var TSMT$Graph = (function () {
+/**
+ * Typescript Math Toolkit: Graph consisting of interconnections between TSMT$GraphNode<T> instances.
+ *
+ * @author Jim Armstrong (www.algorithmist.net), inspired by polygonal ds library
+ *
+ * @version 1.1 (Added DFS/BFS)
+ */
+var GraphNode_1 = require("./GraphNode");
+var TSMT$Graph = /** @class */ (function () {
     /**
      * Construct a new TSMT$Graph<T>
      *
@@ -28,6 +36,10 @@ var TSMT$Graph = (function () {
      * Clear a graph
      */
     TSMT$Graph.prototype.clear = function () {
+        this._struct = this._struct === undefined ? [] : this._struct;
+        this._struct.length = 0;
+        this._traversal = this._traversal === undefined ? [] : this._traversal;
+        this._traversal.length = 0;
         var node = this._nodeList;
         var next;
         var arc;
@@ -156,7 +168,7 @@ var TSMT$Graph = (function () {
         this._size--;
     };
     /**
-     * Add a single arc to this graph by specifying initial and terminal nodes
+     * Add a single edge (or arc) to this graph by specifying initial and terminal nodes
      *
      * @param source: TSMT$GraphNode<T> Source or initial node of the arc
      *
@@ -166,7 +178,7 @@ var TSMT$Graph = (function () {
      *
      * @returns nothing The one-way arc is created and added to the graph
      */
-    TSMT$Graph.prototype.addSingleArc = function (source, target, cost) {
+    TSMT$Graph.prototype.addEdge = function (source, target, cost) {
         if (cost === void 0) { cost = 1.0; }
         var walk = this._nodeList;
         // clip for now
@@ -188,7 +200,7 @@ var TSMT$Graph = (function () {
         }
     };
     /**
-     * Add a mutually connected arc to this graph by specifying initial and terminal nodes
+     * Add a mutually connected edge (or arc) to this graph by specifying initial and terminal nodes
      *
      * @param source: TSMT$GraphNode<T> Source or initial node of the arc
      *
@@ -198,7 +210,7 @@ var TSMT$Graph = (function () {
      *
      * @returns nothing The two-way arc is created and added to the graph
      */
-    TSMT$Graph.prototype.addMutualArc = function (source, target, cost) {
+    TSMT$Graph.prototype.addMutualEdge = function (source, target, cost) {
         if (cost === void 0) { cost = 1.0; }
         var walk = this._nodeList;
         while (walk != null) {
@@ -221,7 +233,7 @@ var TSMT$Graph = (function () {
     /**
      * Clear all marks associated with nodes in this graph
      *
-     * @returns Nothing All nodes in the graph are marked as not having been traversed
+     * @returns Nothing All nodes in the graph are marked as not having been traversed or visited
      */
     TSMT$Graph.prototype.clearMarks = function () {
         var node = this._nodeList;
@@ -247,12 +259,12 @@ var TSMT$Graph = (function () {
      *
      * @param x: T Test value
      *
-     * @returns {boolean} True if the graph contains a node with the specified value
+     * @returns {boolean} True if the graph contains a node with exactly the specified value
      */
     TSMT$Graph.prototype.contains = function (x) {
         var node = this._nodeList;
         while (node != null) {
-            if (node.value == x) {
+            if (node.value === x) {
                 // value found
                 return true;
             }
@@ -261,9 +273,9 @@ var TSMT$Graph = (function () {
         return false;
     };
     /**
-     * Remove the node frmo the graph with the specified value
+     * Remove the node from the graph with the specified value
      *
-     * @param x: T Node value
+     * @param {T} x Node value
      *
      * @returns {boolean} True if a node with the specified value is found and removed from the graph
      */
@@ -286,6 +298,9 @@ var TSMT$Graph = (function () {
         }
         return found;
     };
+    /**
+     * Convert the node list to an Array
+     */
     TSMT$Graph.prototype.toArray = function () {
         var a = new Array();
         var node = this._nodeList;
@@ -329,6 +344,121 @@ var TSMT$Graph = (function () {
             arc0 = hook;
         }
         node.arcList = null;
+    };
+    /**
+     * Perform a depth-first search of an undirected graph, starting at the supplied node and only traversing nodes that
+     * can be reached from that node.  Return the results in an Array of {TSMT$GraphNode<T>>} instances.  Edge costs are
+     * not currently considered.
+     *
+     * @param startNode Can be a reference to a starting node or a node with the specified value (a search is performed
+     * for the start node in the latter case)
+     */
+    TSMT$Graph.prototype.DFS = function (startNode) {
+        if (startNode === void 0) { startNode = null; }
+        // outliers
+        if (this.size === 0) {
+            return [];
+        }
+        if (this.size === 1) {
+            return [this._nodeList];
+        }
+        this._struct.length = 0;
+        this._traversal.length = 0;
+        var node;
+        var rootNode;
+        if (startNode === undefined || startNode == null) {
+            node = this._nodeList;
+        }
+        else if (startNode instanceof GraphNode_1.TSMT$GraphNode) {
+            node = startNode;
+        }
+        else {
+            node = this.findNode(startNode);
+        }
+        rootNode = node;
+        if (rootNode == null) {
+            return [];
+        }
+        while (node != null) {
+            node.marked = false;
+            node = node.next;
+        }
+        // can be done pretty easily recursively; non-recursive version uses a stack as a supporting data structure
+        this.__DFSTraversal(rootNode);
+        return this._traversal;
+    };
+    TSMT$Graph.prototype.__DFSTraversal = function (node) {
+        node.marked = true;
+        this._traversal.push(node);
+        var arc = node.arcList;
+        while (arc != null) {
+            node = arc.node;
+            if (!node.marked) {
+                this.__DFSTraversal(node);
+            }
+            arc = arc.next;
+        }
+    };
+    /**
+     * Perform a breadth-first search of an undirected graph, starting at the supplied node and only traversing nodes that
+     * can be reached from that node.  Return the results in an Array of {TSMT$GraphNode<T>>} instances.  Edge costs are
+     * not currently considered.
+     *
+     * @param startNode Can be a reference to a starting node or a node with the specified value (a search is performed
+     * for the start node in the latter case)
+     */
+    TSMT$Graph.prototype.BFS = function (startNode) {
+        // TODO make this more DRY
+        if (startNode === void 0) { startNode = null; }
+        // outliers
+        if (this.size === 0) {
+            return [];
+        }
+        if (this.size === 1) {
+            return [this._nodeList];
+        }
+        this._struct.length = 0;
+        this._traversal.length = 0;
+        var node;
+        var rootNode;
+        if (startNode === undefined || startNode == null) {
+            node = this._nodeList;
+        }
+        else if (startNode instanceof GraphNode_1.TSMT$GraphNode) {
+            node = startNode;
+        }
+        else {
+            node = this.findNode(startNode);
+        }
+        rootNode = node;
+        if (rootNode == null) {
+            return [];
+        }
+        while (node != null) {
+            node.marked = false;
+            node = node.next;
+        }
+        this.__BFSTraversal(rootNode);
+        return this._traversal;
+    };
+    TSMT$Graph.prototype.__BFSTraversal = function (node) {
+        // Traversal uses a queue (implemented as an Array).  Queue is FIFO, so enqueue is push, dequeue is shift.
+        node.marked = true;
+        this._struct.push(node);
+        var arc;
+        while (this._struct.length > 0) {
+            node = this._struct.shift();
+            this._traversal.push(node);
+            arc = node.arcList;
+            while (arc != null) {
+                node = arc.node;
+                if (!node.marked) {
+                    node.marked = true;
+                    this._struct.push(node);
+                }
+                arc = arc.next;
+            }
+        }
     };
     return TSMT$Graph;
 }());

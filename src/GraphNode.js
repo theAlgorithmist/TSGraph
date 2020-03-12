@@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * @version 1.0
  */
 var GraphArc_1 = require("./GraphArc");
-var TSMT$GraphNode = (function () {
+var TSMT$GraphNode = /** @class */ (function () {
     /**
      * Construct a new GraphNode
      *
@@ -58,7 +58,7 @@ var TSMT$GraphNode = (function () {
         /**
          * Access the id of this graph node
          *
-         * @returns {number} Node ID
+         * @returns {string | number} Node ID
          */
         get: function () {
             return this._id;
@@ -71,7 +71,13 @@ var TSMT$GraphNode = (function () {
          * @returns nothing The new node id is assigned as long as it is a valid input
          */
         set: function (value) {
-            this._id = !isNaN(value) && isFinite(value) && value >= 0 ? value : this._id;
+            if (typeof value === 'string') {
+                this._id = value;
+            }
+            else {
+                var nodeID = +value;
+                this._id = !isNaN(nodeID) && isFinite(nodeID) && value >= 0 ? value : this._id;
+            }
         },
         enumerable: true,
         configurable: true
