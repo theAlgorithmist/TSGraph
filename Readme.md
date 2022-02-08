@@ -6,6 +6,7 @@ This library is roughly inspired by (and might even be considered a lightweight 
 
 The purpose of this release is to make an early version of the source code available to Typescript developers for testing and feedback on the current API.
 
+NOTE:  This data structure [has been updated and is now part of the AMYR library](https://github.com/theAlgorithmist/AMYR).
 Author:  Jim Armstrong - [The Algorithmist]
 
 @algorithmist
